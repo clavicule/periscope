@@ -1,4 +1,6 @@
 {
   "images": "dataset/to_be_sorted",
-  "digit_model": "models/digit.h5"
+  "digit_model": "models/digit.h5",
+  "xml_tags": "dataset/tags.xml",
+  "output": "dataset/tags.csv"
 }
