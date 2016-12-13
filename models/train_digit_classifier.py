@@ -11,16 +11,17 @@ import cv2
 from imutils import paths
 
 
-def prepare_image(image):
+def prepare_image(image, img_rows, img_cols):
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-	image = image.reshape((1, 28, 28))
+	image = cv2.resize(image, (img_rows, img_cols))
+	image = image.reshape((1, img_rows, img_cols))
 	return image
 
 
-def build_batch(im_path):
+def build_batch(im_path, img_rows, img_cols):
 	# load the images from disk, prepare them for extraction, and convert
 	# the list to a NumPy array
-	images = [prepare_image(cv2.imread(p)) for p in im_path]
+	images = [prepare_image(cv2.imread(p), img_rows, img_cols) for p in im_path]
 
 	# extract the labels from the image dir
 	labels = [p.split("/")[-2] for p in im_path]
@@ -44,12 +45,12 @@ kernel_size = (3, 3)
 
 # the data, shuffled and split between train and test sets
 # (X_train, y_train), (X_test, y_test) = mnist.load_data()
-X_train = np.empty((0, 1, 28, 28))
+X_train = np.empty((0, 1, img_rows, img_cols))
 y_train = np.empty((0))
-X_test = np.empty((0, 1, 28, 28))
+X_test = np.empty((0, 1, img_rows, img_cols))
 y_test = np.empty((0))
 for i in range(0, 10):
-	(X, Y) = build_batch(sorted(list(paths.list_images("dataset/{}".format(i)))))
+	(X, Y) = build_batch(sorted(list(paths.list_images("dataset/{}".format(i)))), img_rows, img_cols)
 	X_train = np.concatenate((np.asarray(X[0:75]), X_train))
 	y_train = np.concatenate((np.asarray(Y[0:75]), y_train))
 	X_test = np.concatenate((np.asarray(X[75:]), X_test))
