@@ -1,0 +1,4 @@
+{
+  "images": "dataset/to_be_sorted",
+  "digit_model": "models/digit.h5"
+}
