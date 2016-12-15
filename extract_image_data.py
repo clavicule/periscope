@@ -22,8 +22,7 @@ def main():
 	# load the model recognizing digits
 	digit_models = load_model(conf['digit_model'])
 
-	output = {}
-	headers = ""
+	output = []
 	with open(conf['xml_tags']) as fd:
 		doc = xmltodict.parse(fd.read())
 
@@ -31,8 +30,6 @@ def main():
 		all_tags = {}
 		for tag in doc['dataset']['tags']['tag']:
 			all_tags[tag['@name']] = 0
-
-		headers = ','.join([x for x in sorted(all_tags)])
 
 		for im in doc['dataset']['images']['image']:
 			tags = all_tags.copy()
@@ -81,17 +78,18 @@ def main():
 				tags[im['box']['label']] += 1
 
 			# get count per tag
-			tag_array = [temp_string, date_string, time_string]
-			for t in sorted(tags):
-				tag_array.append(tags[t])
-
-			output[image_path] = tuple(tag_array)
+			for t in tags:
+				if tags[t] > 0:
+					path_decomp = image_path.split('/')
+					output.append(
+						tuple([path_decomp[-1], path_decomp[-2], date_string, time_string, temp_string, t, tags[t]])
+					)
 
 	with open(conf['output'], 'w') as out:
-		out.write("temperature(F), date(MM-DD-YYYY), time(HH:MM:SS), " + headers + "\n")
+		out.write("picture name, folder, date(MM-DD-YYYY), time(HH:MM:SS), temperature, tag, occurrence \n")
 		csv_out = csv.writer(out)
 		for row in output:
-			csv_out.writerow(output[row])
+			csv_out.writerow(row)
 
 
 if __name__ == '__main__':
